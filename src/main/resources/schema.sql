@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS HOSPITAL_PATIENT;
 
 CREATE TABLE `hospital_staff` (
   `id` INT(11) NOT NULL,
-  `name` VARCHAR(50) NOT NULL,
+  `name` VARCHAR(50) UNIQUE NOT NULL,
   `password` TEXT NOT NULL,
   `staff_id` uuid default random_uuid(),
   `registration_date` Date default CURRENT_DATE(),

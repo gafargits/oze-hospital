@@ -22,20 +22,12 @@ public class PatientRepositoryImpl implements PatientRepository {
 
     @Override
     public List<PatientResponse> getPatients() {
-        try{
-            return jdbcTemplate.query(SQL_GET_PATIENTS, new Object[]{}, patientMapper);
-        }catch (Exception e){
-            throw new InvalidRequestException(e.getMessage());
-        }
+        return jdbcTemplate.query(SQL_GET_PATIENTS, patientMapper);
     }
 
     @Override
     public int deletePatients(DeletePatientRequest deletePatientRequest) {
-        try {
-            return jdbcTemplate.update(SQL_DELETE_PATIENTS, new Object[]{deletePatientRequest.getFrom(), deletePatientRequest.getTo()});
-        } catch (Exception e){
-            throw new InvalidRequestException(e.getMessage());
-        }
+        return jdbcTemplate.update(SQL_DELETE_PATIENTS, new Object[]{deletePatientRequest.getFrom(), deletePatientRequest.getTo()});
     }
 
     @Override
