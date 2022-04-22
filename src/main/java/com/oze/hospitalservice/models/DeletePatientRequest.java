@@ -1,9 +1,13 @@
 package com.oze.hospitalservice.models;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 public class DeletePatientRequest {
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date from;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date to;
 
     public DeletePatientRequest(Date from, Date to) {

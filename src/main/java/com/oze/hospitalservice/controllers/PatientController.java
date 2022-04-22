@@ -11,10 +11,12 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -23,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
+@Validated
 @RequestMapping("/api/patient")
 public class PatientController {
 
@@ -46,7 +49,7 @@ public class PatientController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Map<String, Object>> deletePatients(@RequestBody DeletePatientRequest deletePatientRequest, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> deletePatients(@RequestBody @Valid DeletePatientRequest deletePatientRequest, HttpServletRequest request) {
         staffService.getStaff(UUID.fromString(request.getAttribute("uuid").toString()));
         int deletedRows = patientService.deletePatients(deletePatientRequest);
         Map<String, Object> map = new HashMap<>();

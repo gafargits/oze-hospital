@@ -3,6 +3,7 @@ package com.oze.hospitalservice.controllers;
 import com.oze.hospitalservice.Constants;
 import com.oze.hospitalservice.exceptions.InvalidRequestException;
 import com.oze.hospitalservice.models.Staff;
+import com.oze.hospitalservice.models.StaffAuthRequest;
 import com.oze.hospitalservice.models.StaffCreateResponse;
 import com.oze.hospitalservice.services.StaffService;
 import io.jsonwebtoken.Jwts;
@@ -27,19 +28,14 @@ public class StaffController {
     StaffService staffService;
 
     @PostMapping("/register")
-    public ResponseEntity<StaffCreateResponse> registerUser(@RequestBody Map<String, Object> userMap){
-        String name = (String) userMap.get("name");
-        String password = (String) userMap.get("password");
-        StaffCreateResponse staff = staffService.registerStaff(name, password);
+    public ResponseEntity<StaffCreateResponse> registerUser(@RequestBody StaffAuthRequest authRequest){
+        StaffCreateResponse staff = staffService.registerStaff(authRequest.getName(), authRequest.getPassword());
         return new ResponseEntity<>(staff, HttpStatus.CREATED);
     }
     
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> loginStaff(@RequestBody Map<String, String> userMap){
-        String name = (String) userMap.get("name");
-        String password = (String) userMap.get("password");
-
-        Staff staff = staffService.loginStaff(name, password);
+    public ResponseEntity<Map<String, String>> loginStaff(@RequestBody StaffAuthRequest authRequest){
+        Staff staff = staffService.loginStaff(authRequest.getName(), authRequest.getPassword());
         return new ResponseEntity<>(generateJWTToken(staff), HttpStatus.OK);
     }
 

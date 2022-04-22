@@ -2,8 +2,8 @@ package com.oze.hospitalservice.repositories;
 
 import com.oze.hospitalservice.exceptions.InvalidRequestException;
 import com.oze.hospitalservice.models.Staff;
-import com.oze.hospitalservice.models.StaffCreateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,7 +14,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 @Repository
@@ -30,27 +30,15 @@ public class StaffRepositoryImpl implements StaffRepository {
     JdbcTemplate jdbcTemplate;
 
     @Override
-    public StaffCreateResponse create(String name, String password) throws InvalidRequestException {
-        if(name.isEmpty()) throw new InvalidRequestException("Name cannot be blank");
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(10));
-        try{
-            StaffCreateResponse response = new StaffCreateResponse();
+    public Map<String, Object> create(String name, String password) throws InvalidRequestException {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(con -> {
                 PreparedStatement ps = con.prepareStatement(SQL_CREATE_STAFF, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, name);
-                ps.setString(2, hashedPassword);
+                ps.setString(2, password);
                 return ps;
             }, keyHolder);
-            response.setName(name);
-            response.setRegistrationDate((Date) keyHolder.getKeys().get("registration_date"));
-            response.setStaffId((UUID) keyHolder.getKeys().get("staff_id"));
-            response.setId((Integer) keyHolder.getKeys().get("id"));
-
-            return response;
-        } catch (Exception e){
-            throw new InvalidRequestException("Invalid Details. Failed to create staff");
-        }
+            return keyHolder.getKeys();
     }
 
     @Override
@@ -62,10 +50,9 @@ public class StaffRepositoryImpl implements StaffRepository {
     public Staff findById(Integer staffId) {
         try{
             return jdbcTemplate.queryForObject(SQL_FIND_BY_ID, new Object[]{staffId}, staffRowMapper);
-        } catch (Exception e){
+        } catch (DataAccessException e){
             throw new InvalidRequestException("Invalid staff ID");
         }
-
     }
 
     @Override
@@ -76,7 +63,7 @@ public class StaffRepositoryImpl implements StaffRepository {
                 throw new InvalidRequestException("Invalid name/password");
             return staff;
         } catch (EmptyResultDataAccessException e){
-            throw new InvalidRequestException("Invalid name or password");
+            throw new InvalidRequestException("Invalid name/password");
         }
     }
 
